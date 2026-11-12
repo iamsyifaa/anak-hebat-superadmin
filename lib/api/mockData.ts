@@ -12,7 +12,7 @@ const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const MOCK_USER: AuthenticatedUser = {
   id: "1",
-  name: "Admin anaktumbuh",
+  name: "Admin anakhebat",
   username: "admin",
   role: "super_admin",
   avatarUrl: undefined,

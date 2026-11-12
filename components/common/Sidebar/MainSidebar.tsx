@@ -36,7 +36,7 @@ function MainSidebar({ onClickLogout }: Props) {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
             <HiOutlineShieldCheck className="h-4.5 w-4.5 text-[#D7EFFF]" />
           </span>
-          anaktumbuh<span className="text-[#fbbf24]">.id</span>
+          anakhebat<span className="text-[#fbbf24]">.id</span>
         </span>
       </div>
 

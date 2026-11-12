@@ -17,7 +17,7 @@ function MainNavbar({ pageName }: Props) {
     <header className="fixed inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b border-gray-100 bg-white px-4 transition-none lg:pl-64 lg:pr-8">
       <div>
         <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">
-          anaktumbuh.id
+          anakhebat.id
         </p>
         <p className="text-base font-black text-[#203A5B]">{pageName}</p>
       </div>

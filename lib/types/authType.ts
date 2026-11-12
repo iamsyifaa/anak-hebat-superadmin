@@ -1,5 +1,5 @@
-// Role resmi mengikuti Dokumen Requirement ANAKTUMBUH v2 bagian 2. App ini
-// (anak-tumbuh-superadmin) hanya mengizinkan role "super_admin" masuk —
+// Role resmi mengikuti Dokumen Requirement ANAK v2 bagian 2. App ini
+// (anak-hebat-superadmin) hanya mengizinkan role "super_admin" masuk —
 // role lain tetap didefinisikan karena backend-nya sama untuk semua app,
 // tapi akan ditolak oleh useRedirectAfterLogin di bawah.
 export type UserRole = "super_admin" | "headmaster" | "teacher" | "student";
