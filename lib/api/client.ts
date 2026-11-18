@@ -131,41 +131,15 @@ export async function apiRequest<T>(
   const accessToken = token ?? getAccessToken();
   // Kegagalan jaringan sengaja dibiarkan sebagai TypeError dari fetch —
   // alur offline (PWA) mengandalkan itu untuk mendeteksi "sedang offline".
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-  let response: Response;
-  try {
-    // Tanpa cookie: autentikasi hanya lewat header Authorization (jangan pakai
-    // credentials: "include").
-    response = await fetch(url, {
-      method,
-      headers: {
-        Accept: "application/json",
-        // FormData: biarkan browser mengisi Content-Type + boundary multipart.
-        ...(body !== undefined && !(body instanceof FormData)
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      },
-      body:
-        body === undefined
-          ? undefined
-          : body instanceof FormData
-            ? body
-            : JSON.stringify(body),
-      signal: controller.signal,
-    });
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError")
-      throw new ApiError(
-        0,
-        "request_timeout",
-        "Server belum merespons. Coba lagi sebentar lagi.",
-      );
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
+  const response = await fetch(url, {
+    method,
+    headers: {
+      Accept: "application/json",
+      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
 
   // Body bisa kosong atau bukan JSON (mis. 204, atau error dari proxy).
   const raw = await response.text();

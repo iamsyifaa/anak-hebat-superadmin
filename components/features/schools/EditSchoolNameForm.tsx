@@ -52,10 +52,12 @@ function EditSchoolNameForm({ school, onSuccess }: Props) {
         value={name}
         onChange={(event) => setName(event.target.value)}
       />
+
       <p className="text-xs font-semibold text-slate-500">
         Hanya nama yang bisa diubah. Logo tidak bisa diganti setelah sekolah
         dibuat.
       </p>
+
       <PrimaryButton
         type="submit"
         loading={loading}
