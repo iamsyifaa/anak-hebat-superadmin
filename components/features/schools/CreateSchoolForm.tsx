@@ -8,6 +8,7 @@ import {
   storeSchool,
 } from "@/redux/features/school/schoolSlice";
 import TextInput from "@/components/ui/Input/TextInput";
+import ImageInput from "@/components/ui/Input/ImageInput";
 import PrimaryButton from "@/components/ui/Button/PrimaryButton";
 import ErrorAlert from "@/components/ui/Alert/ErrorAlert";
 
@@ -23,6 +24,7 @@ function CreateSchoolForm({ onSuccess }: Props) {
   const { loading, error } = useSelector((state: RootState) => state.school);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [logo, setLogo] = useState<File | null>(null);
 
   // Kalau ada pesan error yang ketinggalan dari percobaan simpan
   // sebelumnya, bersihkan begitu form ini dibuka.
@@ -33,7 +35,7 @@ function CreateSchoolForm({ onSuccess }: Props) {
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
     dispatch(clearSchoolMessage());
-    const result = await dispatch(storeSchool({ name, address }));
+    const result = await dispatch(storeSchool({ name, address, logo }));
     if (storeSchool.fulfilled.match(result)) onSuccess();
   };
 
@@ -62,6 +64,11 @@ function CreateSchoolForm({ onSuccess }: Props) {
         required={false}
         onChange={(event) => setAddress(event.target.value)}
       />
+      <ImageInput onChange={setLogo} />
+      <p className="text-xs font-semibold text-slate-500">
+        Logo hanya bisa ditentukan saat sekolah dibuat dan tidak bisa diganti
+        setelahnya.
+      </p>
       <PrimaryButton type="submit" loading={loading} label="Simpan Sekolah" />
     </form>
   );

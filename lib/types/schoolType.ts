@@ -9,6 +9,8 @@ export interface School {
   // Hanya terisi di mode dummy; backend tidak punya field jenjang.
   level?: EducationLevel;
   address?: string;
+  // URL publik logo (bucket publik), bisa langsung dipakai di <img src>.
+  logo?: string;
   // Kepala sekolah AKTIF sekolah ini (digabung dari GET /headmasters).
   headmasterName?: string;
   headmasterAccountId?: string;
@@ -20,4 +22,6 @@ export interface School {
 export interface CreateSchoolInput {
   name: string;
   address?: string;
+  // Opsional; hanya bisa ditentukan saat sekolah dibuat.
+  logo?: File | null;
 }

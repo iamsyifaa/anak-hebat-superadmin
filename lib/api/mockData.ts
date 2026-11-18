@@ -127,45 +127,19 @@ export async function mockStoreSchool(
   };
 }
 
-export async function mockUpdateSchool(
-  id: string,
-  headmasterAccountId?: string,
-) {
+export async function mockUpdateSchool(id: string, name: string) {
   await delay();
-  const school = MOCK_SCHOOLS.find((s) => s.id === id) ?? MOCK_SCHOOLS[0];
-
-  // Lepas kepsek lama kalau beda dari yang baru dipilih.
-  if (
-    school.headmasterAccountId &&
-    school.headmasterAccountId !== headmasterAccountId
-  ) {
-    const previous = MOCK_ACCOUNTS.find(
-      (a) => a.id === school.headmasterAccountId,
-    );
-    if (previous) {
-      previous.schoolId = undefined;
-      previous.schoolName = undefined;
-    }
+  const school = MOCK_SCHOOLS.find((s) => s.id === id);
+  if (school) {
+    school.name = name;
+    MOCK_ACCOUNTS.filter((a) => a.schoolId === id).forEach((a) => {
+      a.schoolName = name;
+    });
   }
-
-  if (headmasterAccountId) {
-    const account = MOCK_ACCOUNTS.find((a) => a.id === headmasterAccountId);
-    if (account) {
-      account.schoolId = school.id;
-      account.schoolName = school.name;
-      school.headmasterAccountId = account.id;
-      school.headmasterName = account.name;
-    }
-  } else {
-    school.headmasterAccountId = undefined;
-    school.headmasterName = undefined;
-  }
-
   return {
     code: 200,
     message: "Sekolah berhasil diperbarui (mode dummy).",
-    // Salinan juga di sini, dengan alasan yang sama seperti mockStoreSchool.
-    data: { ...school },
+    data: school ? { ...school } : (undefined as never),
   };
 }
 

@@ -2,10 +2,16 @@ import { envConfig } from "@/lib/config/envConfig";
 import { apiRequest, apiRequestAll, type ApiResult } from "@/lib/api/client";
 import { asRec, pick, toNum, toStr, type Rec } from "@/lib/api/mappers";
 import type { CreateSchoolInput, School } from "@/lib/types/schoolType";
-import { mockGetSchoolList, mockStoreSchool, unwrapMock } from "./mockData";
+import {
+  mockGetSchoolList,
+  mockStoreSchool,
+  mockUpdateSchool,
+  unwrapMock,
+} from "./mockData";
 
-// Endpoint backend: GET/POST /schools dan GET /schools/{id} (khusus super
-// admin). Tidak ada PATCH/DELETE sekolah, jadi edit & hapus tidak tersedia.
+// Endpoint backend (khusus super admin): GET/POST /schools, GET /schools/{id},
+// dan PATCH /schools/{id} (Contract v1.3, hanya field name; field lain 422
+// protected_field). Tidak ada DELETE sekolah.
 const ENDPOINT = "/schools";
 
 export interface ListParams {
@@ -21,6 +27,7 @@ const mapSchool = (
   id: toStr(raw.id),
   name: toStr(raw.name),
   address: toStr(raw.address) || undefined,
+  logo: toStr(raw.logo) || undefined,
   headmasterName: headmaster?.name,
   headmasterAccountId: headmaster?.id,
   totalTeachers: toNum(pick(raw, "teachers_count")),
@@ -85,9 +92,36 @@ export const storeSchoolApi = async (
     );
   }
 
+  // Dengan logo: multipart/form-data. Aman diulang: bila penyimpanan gagal
+  // (500), backend tidak menyimpan sekolah setengah jadi.
+  let body: Record<string, unknown> | FormData = {
+    name: input.name,
+    address: input.address || undefined,
+  };
+  if (input.logo) {
+    const form = new FormData();
+    form.append("name", input.name);
+    if (input.address) form.append("address", input.address);
+    form.append("logo", input.logo);
+    body = form;
+  }
   const { data } = await apiRequest<unknown>(ENDPOINT, {
     method: "POST",
-    body: { name: input.name, address: input.address || undefined },
+    body,
+  });
+  return { data: mapSchool(asRec(data)) };
+};
+
+export const updateSchoolNameApi = async (
+  id: string,
+  name: string,
+): Promise<ApiResult<School>> => {
+  if (envConfig.useMockApi) return unwrapMock(await mockUpdateSchool(id, name));
+
+  // Hanya kirim name. Alamat dan field lain ditolak backend (422).
+  const { data } = await apiRequest<unknown>(`${ENDPOINT}/${id}`, {
+    method: "PATCH",
+    body: { name },
   });
   return { data: mapSchool(asRec(data)) };
 };

@@ -8,10 +8,13 @@ import { getSchoolList } from "@/redux/features/school/schoolSlice";
 import { School } from "@/lib/types/schoolType";
 import { useDebounce } from "@/hook/useDebounce";
 import MainCard from "@/components/ui/Card/MainCard";
+import EditModal from "@/components/ui/Modal/EditModal";
 import CreateModal from "@/components/ui/Modal/CreateModal";
 import SuccessModal from "@/components/ui/Modal/SuccessModal";
+import TableEditButton from "@/components/common/DataTable/TableEditButton";
 import TableToolbar from "@/components/common/DataTable/TableToolbar";
 import CreateSchoolForm from "./CreateSchoolForm";
+import EditSchoolNameForm from "./EditSchoolNameForm";
 
 function SchoolDataTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,7 +25,10 @@ function SchoolDataTable() {
   const debouncedSearch = useDebounce(search);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [modal, setModal] = useState<"create" | "success" | null>(null);
+  const [modal, setModal] = useState<"create" | "edit" | "success" | null>(
+    null,
+  );
+  const [editing, setEditing] = useState<School | null>(null);
 
   useEffect(() => {
     dispatch(getSchoolList({ search: debouncedSearch, page, perPage }));
@@ -36,6 +42,19 @@ function SchoolDataTable() {
       name: "Nama Sekolah",
       selector: (row: School) => row.name,
       sortable: true,
+      cell: (row: School) => (
+        <div className="flex items-center gap-2">
+          {row.logo && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={row.logo}
+              alt={`Logo ${row.name}`}
+              className="h-8 w-8 rounded-full object-cover"
+            />
+          )}
+          <span>{row.name}</span>
+        </div>
+      ),
     },
     {
       name: "Kepala Sekolah",
@@ -43,6 +62,18 @@ function SchoolDataTable() {
     },
     { name: "Guru", selector: (row: School) => row.totalTeachers },
     { name: "Siswa", selector: (row: School) => row.totalStudents },
+    {
+      name: "Aksi",
+      cell: (row: School) => (
+        <TableEditButton
+          onClick={() => {
+            setEditing(row);
+            setModal("edit");
+          }}
+        />
+      ),
+      width: "90px",
+    },
   ];
 
   return (
@@ -83,6 +114,18 @@ function SchoolDataTable() {
             }}
           />
         </CreateModal>
+      )}
+
+      {modal === "edit" && editing && (
+        <EditModal title="Edit Nama Sekolah" onClose={() => setModal(null)}>
+          <EditSchoolNameForm
+            school={editing}
+            onSuccess={() => {
+              setModal("success");
+              refresh();
+            }}
+          />
+        </EditModal>
       )}
 
       {modal === "success" && (

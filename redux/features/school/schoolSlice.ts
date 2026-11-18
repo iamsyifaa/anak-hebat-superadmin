@@ -3,6 +3,7 @@ import { School, CreateSchoolInput } from "@/lib/types/schoolType";
 import {
   getSchoolListApi,
   storeSchoolApi,
+  updateSchoolNameApi,
   type ListParams,
 } from "@/lib/api/schoolApi";
 
@@ -31,8 +32,11 @@ export const storeSchool = createAsyncThunk(
   (input: CreateSchoolInput) => storeSchoolApi(input),
 );
 
-// Backend hanya menyediakan GET & POST /schools (tanpa PATCH/DELETE),
-// jadi tidak ada thunk edit/hapus sekolah.
+// PATCH /schools/{id}: hanya nama. Tidak ada hapus sekolah.
+export const updateSchoolName = createAsyncThunk(
+  "school/updateSchoolName",
+  ({ id, name }: { id: string; name: string }) => updateSchoolNameApi(id, name),
+);
 
 const schoolSlice = createSlice({
   name: "school",
@@ -68,6 +72,17 @@ const schoolSlice = createSlice({
       .addCase(storeSchool.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Gagal menambahkan sekolah.";
+      })
+      .addCase(updateSchoolName.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateSchoolName.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateSchoolName.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Gagal memperbarui sekolah.";
       });
   },
 });
